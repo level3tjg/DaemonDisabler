@@ -1,0 +1,9 @@
+Package: com.level3tjg.daemondisabler
+Name: DaemonDisabler
+Depends: mobilesubstrate, preferenceloader, ldid
+Version: 1.1.1
+Architecture: iphoneos-arm
+Description: Disable / Enable launch daemons on the fly from the Settings app
+Maintainer: level3tjg
+Author: level3tjg
+Section: Tweaks
