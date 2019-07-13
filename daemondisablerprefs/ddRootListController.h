@@ -2,6 +2,19 @@
 #import <Preferences/PSSpecifier.h>
 #import <Preferences/PSSwitchTableCell.h>
 
-@interface ddRootListController : PSListController <UISearchBarDelegate>
+@interface PSTableCell (Custom)
+@end
 
+@interface PSControlTableCell (Custom)
+-(UIControl *)control;
+@end
+
+@interface PSSwitchTableCell (Custom)
+-(id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(id)identifier specifier:(id)specifier;
+@end
+
+@interface SRSwitchTableCell : PSSwitchTableCell
+@end
+
+@interface ddRootListController : PSListController <UISearchBarDelegate>
 @end

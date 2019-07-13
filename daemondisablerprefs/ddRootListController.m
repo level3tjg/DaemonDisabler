@@ -51,6 +51,7 @@
     if([value isEqual:@NO]){
         UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"DaemonDisabler" message:[NSString stringWithFormat:@"Are you sure you want to disable %@?", daemon] preferredStyle:UIAlertControllerStyleAlert];
         UIAlertAction *okAction = [UIAlertAction actionWithTitle:@"Yes" style:UIAlertActionStyleDefault handler:^(UIAlertAction * action){
+        	NSLog(@"unloading %@", daemon);
             pid_t pid;
             int status;
             const char *argv[] = {"launchctl_wrapper", "unload", [daemon UTF8String], NULL};
