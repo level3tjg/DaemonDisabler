@@ -48,10 +48,14 @@
     NSString *daemon = specifier.properties[@"key"];
     NSDictionary *daemonPlist = [NSDictionary dictionaryWithContentsOfFile:daemon];
     NSString *service = [daemonPlist objectForKey:@"Label"];
+    if(!service){
+        NSArray *components =  [[daemon lastPathComponent] componentsSeparatedByString:@"."];
+        service = components[[components count]-2];
+    }
     if([value isEqual:@NO]){
         UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"DaemonDisabler" message:[NSString stringWithFormat:@"Are you sure you want to disable %@?", daemon] preferredStyle:UIAlertControllerStyleAlert];
         UIAlertAction *okAction = [UIAlertAction actionWithTitle:@"Yes" style:UIAlertActionStyleDefault handler:^(UIAlertAction * action){
-        	NSLog(@"unloading %@", daemon);
+
             pid_t pid;
             int status;
             const char *argv[] = {"launchctl_wrapper", "unload", [daemon UTF8String], NULL};
@@ -106,6 +110,10 @@
     [super viewWillAppear:animated];
     UIViewController *vc = [self.navigationController valueForKey:@"_rootListController"];
     UINavigationBar *bar = [[vc navigationController] navigationBar];
+    for(UILabel *label in bar.allSubviews)
+        if([label isKindOfClass:[UILabel class]])
+            if([label.text isEqualToString:@"DaemonDisabler"])
+                label.hidden = true;
     [bar setTintColor:[UIColor colorWithRed:0.9 green:0.1 blue:0.1 alpha:1.0]];
     UIImageView *imageView = [[UIImageView alloc] initWithImage:[UIImage imageWithContentsOfFile:@"/Library/PreferenceBundles/DaemonDisablerPrefs.bundle/Icon@3x.png"]];
     CGSize imageSize = CGSizeMake(40, 40);
@@ -113,7 +121,7 @@
     imageView.frame = CGRectMake(marginX, 0, imageSize.width, imageSize.height);
     imageView.alpha = 0;
     [bar addSubview:imageView];
-    [UIView animateWithDuration:1.0 animations:^(void) {
+    [UIView animateWithDuration:1.0 animations:^(void){
         imageView.alpha = 1;
     }];
 }
