@@ -1,5 +1,4 @@
-#include <spawn.h>
-#include <signal.h>
+#import "NSTask.h"
 
 NSDictionary *prefs;
 
@@ -8,11 +7,10 @@ NSDictionary *prefs;
 	%orig();
 	for(NSString *daemon in [prefs allKeys]){
 		if([[prefs objectForKey:daemon] boolValue] == FALSE){
-			pid_t pid;
-			int status;
-			const char *argv[] = {"launchctl_wrapper", "unload", [daemon UTF8String], NULL};
-			posix_spawn(&pid, "/usr/libexec/launchctl_wrapper", NULL, NULL, (char* const*)argv, NULL);
-			waitpid(pid, &status, WEXITED);
+			NSTask *task = [NSTask new];
+			[task setLaunchPath:@"/usr/libexec/launchctl_wrapper"];
+			[task setArguments:@[@"unload", daemon]];
+			[task launch];
 		}
 	}
 }

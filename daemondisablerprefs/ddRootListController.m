@@ -1,6 +1,5 @@
 #include "ddRootListController.h"
-#include <spawn.h>
-#include <signal.h>
+#import "../NSTask.h"
 
 @implementation SRSwitchTableCell
 
@@ -56,11 +55,10 @@
         UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"DaemonDisabler" message:[NSString stringWithFormat:@"Are you sure you want to disable %@?", daemon] preferredStyle:UIAlertControllerStyleAlert];
         UIAlertAction *okAction = [UIAlertAction actionWithTitle:@"Yes" style:UIAlertActionStyleDefault handler:^(UIAlertAction * action){
 
-            pid_t pid;
-            int status;
-            const char *argv[] = {"launchctl_wrapper", "unload", [daemon UTF8String], NULL};
-            posix_spawn(&pid, "/usr/libexec/launchctl_wrapper", NULL, NULL, (char* const*)argv, NULL);
-            waitpid(pid, &status, WEXITED);
+            NSTask *task = [NSTask new];
+            [task setLaunchPath:@"/usr/libexec/launchctl_wrapper"];
+            [task setArguments:@[@"unload", daemon]];
+            [task launch];
             [defaults setObject:value forKey:specifier.properties[@"key"]];
             [defaults writeToFile:@"/var/mobile/Library/Preferences/com.level3tjg.daemondisabler.plist" atomically:YES];
         }];
@@ -73,18 +71,16 @@
         [self presentViewController:alert animated:YES completion:nil];
     }
     else{
-        pid_t pid;
-        int status;
-        const char *argv[] = {"launchctl_wrapper", "load", "-w", [daemon UTF8String], NULL};
-        posix_spawn(&pid, "/usr/libexec/launchctl_wrapper", NULL, NULL, (char* const*)argv, NULL);
-        waitpid(pid, &status, WEXITED);
+        NSTask *task = [NSTask new];
+        [task setLaunchPath:@"/usr/libexec/launchctl_wrapper"];
+        [task setArguments:@[@"load", daemon]];
+        [task launch];
         UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"DaemonDisabler" message:[NSString stringWithFormat:@"Would you like to kickstart %@?", service] preferredStyle:UIAlertControllerStyleAlert];
         UIAlertAction *okAction = [UIAlertAction actionWithTitle:@"Yes" style:UIAlertActionStyleDefault handler:^(UIAlertAction * action){
-            pid_t pid;
-            int status;
-            const char *argv[] = {"launchctl_wrapper", "kickstart", "-k", [[NSString stringWithFormat:@"system/%@", service] UTF8String], NULL};
-            posix_spawn(&pid, "/usr/libexec/launchctl_wrapper", NULL, NULL, (char* const*)argv, NULL);
-            waitpid(pid, &status, WEXITED);
+            NSTask *task = [NSTask new];
+            [task setLaunchPath:@"/usr/libexec/launchctl_wrapper"];
+            [task setArguments:@[@"kickstart", @"-k", [NSString stringWithFormat:@"system/%@", service]]];
+            [task launch];
         }];
         UIAlertAction *otherAction = [UIAlertAction actionWithTitle:@"No" style:UIAlertActionStyleDefault handler:^(UIAlertAction * action){
             [alert dismissViewControllerAnimated:YES completion:nil];
